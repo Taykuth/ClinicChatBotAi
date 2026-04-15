@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gülüş Estetik Kliniği</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body {
+    background: #e5ddd5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .app {
+    width: 100%;
+    max-width: 480px;
+    height: 100vh;
+    max-height: 800px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  header {
+    background: #1a73e8;
+    color: #fff;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .avatar {
+    width: 42px;
+    height: 42px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .title h1 { font-size: 16px; font-weight: 600; }
+  .title p { font-size: 12px; opacity: 0.85; }
+  .chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background: #efeae2;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .msg {
+    max-width: 78%;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.08);
+  }
+  .msg.bot {
+    align-self: flex-start;
+    background: #fff;
+    border-top-left-radius: 2px;
+  }
+  .msg.user {
+    align-self: flex-end;
+    background: #1a73e8;
+    color: #fff;
+    border-top-right-radius: 2px;
+  }
+  .typing {
+    align-self: flex-start;
+    background: #fff;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #777;
+    font-style: italic;
+  }
+  form {
+    display: flex;
+    padding: 10px;
+    gap: 8px;
+    background: #f0f2f5;
+    border-top: 1px solid #ddd;
+  }
+  input {
+    flex: 1;
+    padding: 12px 14px;
+    border: none;
+    border-radius: 24px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+  }
+  button {
+    background: #1a73e8;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  @media (max-width: 480px) {
+    .app { max-height: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="avatar">🦷</div>
+    <div class="title">
+      <h1>Gülüş Estetik Kliniği</h1>
+      <p>Çevrimiçi • Size nasıl yardımcı olabilirim?</p>
+    </div>
+  </header>
+  <div class="chat" id="chat"></div>
+  <form id="form">
+    <input id="input" type="text" placeholder="Mesajınızı yazın..." autocomplete="off" required />
+    <button type="submit" id="send">➤</button>
+  </form>
+</div>
+
+<script>
+  const chatEl = document.getElementById('chat');
+  const form = document.getElementById('form');
+  const input = document.getElementById('input');
+  const sendBtn = document.getElementById('send');
+  const history = [];
+
+  function addMsg(role, text) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + (role === 'user' ? 'user' : 'bot');
+    div.textContent = text;
+    chatEl.appendChild(div);
+    chatEl.scrollTop = chatEl.scrollHeight;
+  }
+
+  function showTyping() {
+    const div = document.createElement('div');
+    div.className = 'typing';
+    div.id = 'typing';
+    div.textContent = 'Yazıyor...';
+    chatEl.appendChild(div);
+    chatEl.scrollTop = chatEl.scrollHeight;
+  }
+
+  function hideTyping() {
+    const t = document.getElementById('typing');
+    if (t) t.remove();
+  }
+
+  // Greeting
+  addMsg('bot', 'Merhaba! 🦷 Gülüş Estetik Kliniği\'ne hoş geldiniz. Size nasıl yardımcı olabilirim?');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = input.value.trim();
+    if (!message) return;
+
+    addMsg('user', message);
+    input.value = '';
+    sendBtn.disabled = true;
+    showTyping();
+
+    try {
+      const res = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, history })
+      });
+      const data = await res.json();
+      hideTyping();
+      addMsg('bot', data.reply);
+      history.push({ role: 'user', content: message });
+      history.push({ role: 'assistant', content: data.reply });
+    } catch (err) {
+      hideTyping();
+      addMsg('bot', 'Bağlantı hatası oluştu. Lütfen tekrar deneyin.');
+    } finally {
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  });
+</script>
+</body>
+</html>
