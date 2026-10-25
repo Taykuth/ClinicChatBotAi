@@ -1,0 +1,19 @@
+{
+  "name": "Gülüş Estetik Kliniği",
+  "type": "diş ve estetik kliniği",
+  "services": [
+    {"name": "Diş beyazlatma", "price_try": 2500},
+    {"name": "İmplant", "price_try": 8000},
+    {"name": "Zirkonyum kaplama", "price_try": 3500},
+    {"name": "Botoks", "price_try": 3000},
+    {"name": "Dolgu", "price_try": 2000},
+    {"name": "PRP", "price_try": 1500}
+  ],
+  "hours": [
+    "Pazartesi - Cuma: 09:00 - 19:00",
+    "Cumartesi: 10:00 - 17:00",
+    "Pazar: Kapalı"
+  ],
+  "address": "Körfez Mah. Atatürk Cad. No:42, İzmit/Kocaeli",
+  "whatsapp": "0532 000 00 00"
+}
