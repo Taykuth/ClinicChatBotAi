@@ -7,7 +7,7 @@ Built with FastAPI and OpenAI `gpt-4o-mini`. The reference clinic, *Gülüş Est
 ## How it works
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Browser chat<br/>static/index.html] -- message + last turns --> B[FastAPI /chat]
     C[clinic.json<br/>services, prices, hours, address] --> D[System prompt]
     B --> E{Checks}
